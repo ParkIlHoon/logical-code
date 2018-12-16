@@ -1,5 +1,7 @@
 Chapter01 : Opening of HTTP
 =================================================
+See this in Tistory (http://logical-code.tistory.com/107)
+
 Media Type
 -------------------------------------------------
   - HTTP labels data format label called "MIME" to each object transmitted on Web.
