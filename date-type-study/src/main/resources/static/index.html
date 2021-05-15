@@ -1,0 +1,229 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <title>날짜 타입 공부</title>
+</head>
+<body>
+    <div>
+        <h1>Server Default TimeZone is UTC</h1>
+        <h1>Server Accepted Date-Time Format is ISO 8601</h1>
+        <ul>
+            <li>spring.jackson.date-format=com.fasterxml.jackson.databind.util.ISO8601DateFormat</li>
+            <li>spring.mvc.format.date=iso</li>
+            <li>spring.mvc.format.time=iso</li>
+            <li>spring.mvc.format.date-time=iso-offset</li>
+        </ul>
+        <h1 id="client-timezone">Client TimeZone is</h1>
+    </div>
+    <hr>
+    <div>
+        <h1 id="h-localdatetime-1">LocalDateTime</h1>
+        <ul>
+            <li>Client : new Date().toISOString()</li>
+            <li>Server : LocalDateTime</li>
+            <li id="li-localdatetime-1">Client new Date().toString() : </li>
+            <li>
+                <button id="btn-localdatetime-1">Send Request</button><br>
+                <textarea id="result-localdatetime-1" style="width: 100%"></textarea>
+            </li>
+            <li id="resp-localdatetime-1">Response Date : </li>
+        </ul>
+    </div>
+    <div>
+        <h1 id="h-zoneddatetime-1">ZonedDateTime</h1>
+        <ul>
+            <li>Client : new Date().toISOString()</li>
+            <li>Server : ZonedDateTime</li>
+            <li id="li-zoneddatetime-1">Client new Date().toString() : </li>
+            <li>
+                <button id="btn-zoneddatetime-1">Send Request</button><br>
+                <textarea id="result-zoneddatetime-1" style="width: 100%"></textarea>
+            </li>
+            <li id="resp-zoneddatetime-1">Response Date : </li>
+        </ul>
+    </div>
+    <div>
+        <h1 id="h-localdatetime-2">LocalDateTime -> ZonedDateTime (UTC)</h1>
+        <ul>
+            <li>Client : new Date().toISOString()</li>
+            <li>Server : LocalDateTime -> ZonedDateTime (UTC)</li>
+            <li id="li-localdatetime-2">Client new Date().toString() : </li>
+            <li>
+                <button id="btn-localdatetime-2">Send Request</button><br>
+                <textarea id="result-localdatetime-2" style="width: 100%"></textarea>
+            </li>
+            <li id="resp-localdatetime-2">Response Date : </li>
+        </ul>
+    </div>
+    <div>
+        <h1 id="h-localdatetime-3">LocalDateTime -> ZonedDateTime (Asia/Seoul)</h1>
+        <ul>
+            <li>Client : new Date().toISOString()</li>
+            <li>Server : LocalDateTime -> ZonedDateTime (Asia/Seoul)</li>
+            <li id="li-localdatetime-3">Client new Date().toString() : </li>
+            <li>
+                <button id="btn-localdatetime-3">Send Request</button><br>
+                <textarea id="result-localdatetime-3" style="width: 100%"></textarea>
+            </li>
+            <li id="resp-localdatetime-3">Response Date : </li>
+        </ul>
+    </div>
+    <div>
+        <h1 id="h-zoneddatetime-2">ZonedDateTime -> LocalDateTime</h1>
+        <ul>
+            <li>Client : new Date().toISOString()</li>
+            <li>Server : ZonedDateTime -> LocalDateTime</li>
+            <li id="li-zoneddatetime-2">Client new Date().toString() : </li>
+            <li>
+                <button id="btn-zoneddatetime-2">Send Request</button><br>
+                <textarea id="result-zoneddatetime-2" style="width: 100%"></textarea>
+            </li>
+            <li id="resp-zoneddatetime-2">Response Date : </li>
+        </ul>
+    </div>
+
+
+        <script src="https://code.jquery.com/jquery-3.6.0.min.js" integrity="sha256-/xUj+3OJU5yExlq6GSYGSHk7tPXikynS7ogEvDej/m4=" crossorigin="anonymous"></script>
+<script type="application/javascript">
+    $(function(){
+        $("#client-timezone").text("Client TimeZone is " + Intl.DateTimeFormat().resolvedOptions().timeZone);
+
+        $("#btn-localdatetime-1").on("click", function(){
+            var clientDate = new Date();
+
+            $("#result-localdatetime-1").val("");
+            $("#resp-localdatetime-1").text("");
+            $("#li-localdatetime-1").text("Client new Date().toString() : " + clientDate.toString());
+
+            $.ajax({
+                url : "/local",
+                type : "GET",
+                data : { date : clientDate.toISOString() },
+                contentType : "application/x-www-form-urlencoded; charset=UTF-8;",
+                success : function (data) {
+                    var respDate = new Date(data.clientDate);
+
+                    $("#result-localdatetime-1").val(JSON.stringify(data));
+                    $("#resp-localdatetime-1").text("Response Date(new Date(data.clientDate).toString()) : " + respDate.toString());
+
+                    if (clientDate.toString() == respDate.toString()) {
+                        $("#h-localdatetime-1").css("color", "green");
+                    } else {
+                        $("#h-localdatetime-1").css("color", "red");
+                    }
+                }
+            })
+        });
+
+        $("#btn-zoneddatetime-1").on("click", function(){
+            var clientDate = new Date();
+
+            $("#result-zoneddatetime-1").val("");
+            $("#resp-zoneddatetime-1").text("");
+            $("#li-zoneddatetime-1").text("Client new Date().toString() : " + clientDate.toString());
+
+            $.ajax({
+                url : "/zoned",
+                type : "GET",
+                data : { date : clientDate.toISOString() },
+                contentType : "application/x-www-form-urlencoded; charset=UTF-8;",
+                success : function (data) {
+                    var respDate = new Date(data.clientDate);
+
+                    $("#result-zoneddatetime-1").val(JSON.stringify(data));
+                    $("#resp-zoneddatetime-1").text("Response Date(new Date(data.clientDate).toString()) : " + respDate.toString());
+
+                    if (clientDate.toString() == respDate.toString()) {
+                        $("#h-zoneddatetime-1").css("color", "green");
+                    } else {
+                        $("#h-zoneddatetime-1").css("color", "red");
+                    }
+                }
+            })
+        });
+
+        $("#btn-localdatetime-2").on("click", function(){
+            var clientDate = new Date();
+
+            $("#result-localdatetime-2").val("");
+            $("#resp-localdatetime-2").text("");
+            $("#li-localdatetime-2").text("Client new Date().toString() : " + clientDate.toString());
+
+            $.ajax({
+                url : "/local/convert/UTC",
+                type : "GET",
+                data : { date : clientDate.toISOString() },
+                contentType : "application/x-www-form-urlencoded; charset=UTF-8;",
+                success : function (data) {
+                    var respDate = new Date(data.convertedDate);
+
+                    $("#result-localdatetime-2").val(JSON.stringify(data));
+                    $("#resp-localdatetime-2").text("Response Date(new Date(data.convertedDate).toString()) : " + respDate.toString());
+
+                    if (clientDate.toString() == respDate.toString()) {
+                        $("#h-localdatetime-2").css("color", "green");
+                    } else {
+                        $("#h-localdatetime-2").css("color", "red");
+                    }
+                }
+            })
+        });
+
+        $("#btn-localdatetime-3").on("click", function(){
+            var clientDate = new Date();
+
+            $("#result-localdatetime-3").val("");
+            $("#resp-localdatetime-3").text("");
+            $("#li-localdatetime-3").text("Client new Date().toString() : " + clientDate.toString());
+
+            $.ajax({
+                url : "/local/convert/KST",
+                type : "GET",
+                data : { date : clientDate.toISOString() },
+                contentType : "application/x-www-form-urlencoded; charset=UTF-8;",
+                success : function (data) {
+                    var respDate = new Date(data.convertedDate);
+
+                    $("#result-localdatetime-3").val(JSON.stringify(data));
+                    $("#resp-localdatetime-3").text("Response Date(new Date(data.convertedDate).toString()) : " + respDate.toString());
+
+                    if (clientDate.toString() == respDate.toString()) {
+                        $("#h-localdatetime-3").css("color", "green");
+                    } else {
+                        $("#h-localdatetime-3").css("color", "red");
+                    }
+                }
+            })
+        });
+
+        $("#btn-zoneddatetime-2").on("click", function(){
+            var clientDate = new Date();
+
+            $("#result-zoneddatetime-2").val("");
+            $("#resp-zoneddatetime-2").text("");
+            $("#li-zoneddatetime-2").text("Client new Date().toString() : " + clientDate.toString());
+
+            $.ajax({
+                url : "/zoned/convert",
+                type : "GET",
+                data : { date : clientDate.toISOString() },
+                contentType : "application/x-www-form-urlencoded; charset=UTF-8;",
+                success : function (data) {
+                    var respDate = new Date(data.convertedDate);
+
+                    $("#result-zoneddatetime-2").val(JSON.stringify(data));
+                    $("#resp-zoneddatetime-2").text("Response Date(new Date(data.convertedDate).toString()) : " + respDate.toString());
+
+                    if (clientDate.toString() == respDate.toString()) {
+                        $("#h-zoneddatetime-2").css("color", "green");
+                    } else {
+                        $("#h-zoneddatetime-2").css("color", "red");
+                    }
+                }
+            })
+        });
+    });
+</script>
+</body>
+</html>
