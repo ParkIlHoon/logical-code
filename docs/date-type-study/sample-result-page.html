@@ -1,0 +1,86 @@
+<!DOCTYPE html>
+<!-- saved from url=(0022)http://localhost:8080/ -->
+<html lang="ko"><head><meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+    
+    <title>날짜 타입 공부</title>
+</head>
+<body>
+    <div>
+        <h1>Server Default TimeZone is UTC</h1>
+        <h1>Server Accepted Date-Time Format is ISO 8601</h1>
+        <ul>
+            <li>spring.jackson.date-format=com.fasterxml.jackson.databind.util.ISO8601DateFormat</li>
+            <li>spring.mvc.format.date=iso</li>
+            <li>spring.mvc.format.time=iso</li>
+            <li>spring.mvc.format.date-time=iso-offset</li>
+        </ul>
+        <h1 id="client-timezone">Client TimeZone is Asia/Seoul</h1>
+    </div>
+    <hr>
+    <div>
+        <h1 id="h-localdatetime-1" style="color: red;">LocalDateTime</h1>
+        <ul>
+            <li>Client : new Date().toISOString()</li>
+            <li>Server : LocalDateTime</li>
+            <li id="li-localdatetime-1">Client new Date().toString() : Sat May 15 2021 17:13:01 GMT+0900 (대한민국 표준시)</li>
+            <li>
+                <button id="btn-localdatetime-1">Send Request</button><br>
+                <textarea id="result-localdatetime-1" style="width: 100%">{"clientDate":"2021-05-15T08:13:01.547","serverDate":"2021-05-15T08:13:01.563295"}</textarea>
+            </li>
+            <li id="resp-localdatetime-1">Response Date(new Date(data.clientDate).toString()) : Sat May 15 2021 08:13:01 GMT+0900 (대한민국 표준시)</li>
+        </ul>
+    </div>
+    <div>
+        <h1 id="h-zoneddatetime-1" style="color: green;">ZonedDateTime</h1>
+        <ul>
+            <li>Client : new Date().toISOString()</li>
+            <li>Server : ZonedDateTime</li>
+            <li id="li-zoneddatetime-1">Client new Date().toString() : Sat May 15 2021 17:13:08 GMT+0900 (대한민국 표준시)</li>
+            <li>
+                <button id="btn-zoneddatetime-1">Send Request</button><br>
+                <textarea id="result-zoneddatetime-1" style="width: 100%">{"clientDate":"2021-05-15T08:13:08.281Z","serverDate":"2021-05-15T08:13:08.287523Z","zoneId":"Z"}</textarea>
+            </li>
+            <li id="resp-zoneddatetime-1">Response Date(new Date(data.clientDate).toString()) : Sat May 15 2021 17:13:08 GMT+0900 (대한민국 표준시)</li>
+        </ul>
+    </div>
+    <div>
+        <h1 id="h-localdatetime-2" style="color: green;">LocalDateTime -&gt; ZonedDateTime (UTC)</h1>
+        <ul>
+            <li>Client : new Date().toISOString()</li>
+            <li>Server : LocalDateTime -&gt; ZonedDateTime (UTC)</li>
+            <li id="li-localdatetime-2">Client new Date().toString() : Sat May 15 2021 17:13:10 GMT+0900 (대한민국 표준시)</li>
+            <li>
+                <button id="btn-localdatetime-2">Send Request</button><br>
+                <textarea id="result-localdatetime-2" style="width: 100%">{"clientDate":"2021-05-15T08:13:10.091","serverDate":"2021-05-15T08:13:10.097364","convertedDate":"2021-05-15T08:13:10.091Z","zoneId":"UTC"}</textarea>
+            </li>
+            <li id="resp-localdatetime-2">Response Date(new Date(data.convertedDate).toString()) : Sat May 15 2021 17:13:10 GMT+0900 (대한민국 표준시)</li>
+        </ul>
+    </div>
+    <div>
+        <h1 id="h-localdatetime-3" style="color: red;">LocalDateTime -&gt; ZonedDateTime (Asia/Seoul)</h1>
+        <ul>
+            <li>Client : new Date().toISOString()</li>
+            <li>Server : LocalDateTime -&gt; ZonedDateTime (Asia/Seoul)</li>
+            <li id="li-localdatetime-3">Client new Date().toString() : Sat May 15 2021 17:13:11 GMT+0900 (대한민국 표준시)</li>
+            <li>
+                <button id="btn-localdatetime-3">Send Request</button><br>
+                <textarea id="result-localdatetime-3" style="width: 100%">{"clientDate":"2021-05-15T08:13:11.186","serverDate":"2021-05-15T08:13:11.192808","convertedDate":"2021-05-15T08:13:11.186+09:00","zoneId":"Asia/Seoul"}</textarea>
+            </li>
+            <li id="resp-localdatetime-3">Response Date(new Date(data.convertedDate).toString()) : Sat May 15 2021 08:13:11 GMT+0900 (대한민국 표준시)</li>
+        </ul>
+    </div>
+    <div>
+        <h1 id="h-zoneddatetime-2" style="color: red;">ZonedDateTime -&gt; LocalDateTime</h1>
+        <ul>
+            <li>Client : new Date().toISOString()</li>
+            <li>Server : ZonedDateTime -&gt; LocalDateTime</li>
+            <li id="li-zoneddatetime-2">Client new Date().toString() : Sat May 15 2021 17:13:12 GMT+0900 (대한민국 표준시)</li>
+            <li>
+                <button id="btn-zoneddatetime-2">Send Request</button><br>
+                <textarea id="result-zoneddatetime-2" style="width: 100%">{"clientDate":"2021-05-15T08:13:12.62Z","serverDate":"2021-05-15T08:13:12.626602Z","zoneId":"Z","convertDate":"2021-05-15T08:13:12.62"}</textarea>
+            </li>
+            <li id="resp-zoneddatetime-2">Response Date(new Date(data.convertedDate).toString()) : Invalid Date</li>
+        </ul>
+    </div>
+</body>
+</html>
