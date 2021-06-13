@@ -6,34 +6,37 @@ import com.example.springsecuritystudy.security.AccountContext;
 import com.example.springsecuritystudy.security.AccountContextService;
 import com.example.springsecuritystudy.security.tokens.PostAuthorizationToken;
 import com.example.springsecuritystudy.security.tokens.PreAuthorizationToken;
-import org.springframework.beans.factory.annotation.Autowired;
+import lombok.RequiredArgsConstructor;
 import org.springframework.security.authentication.AuthenticationProvider;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.stereotype.Component;
 
 import java.util.NoSuchElementException;
 
-
+@Component
+@RequiredArgsConstructor
 public class FormLoginAuthenticationProvider implements AuthenticationProvider {
 
-    @Autowired
-    private AccountContextService accountContextService;
-    @Autowired
-    private AccountRepository accountRepository;
-    @Autowired
-    private PasswordEncoder passwordEncoder;
+    private final AccountContextService accountContextService;
+    private final AccountRepository accountRepository;
+    private final PasswordEncoder passwordEncoder;
 
-
+    /**
+     * 인증 처리
+     */
     @Override
     public Authentication authenticate(Authentication authentication) throws AuthenticationException {
-
+        // 인증 전 토큰 취득
         PreAuthorizationToken preAuthorizationToken = (PreAuthorizationToken) authentication;
 
         String username = preAuthorizationToken.getUsername();
         String userPassword = preAuthorizationToken.getUserPassword();
 
+        // 사용자 조회
         Account account = accountRepository.findByUserId(username).orElseThrow(NoSuchElementException::new);
+        // 사용자/패스워드 일치 시 인증 후 토큰 생성 및 반환
         if (isCorrectPassword(userPassword, account)) {
             return PostAuthorizationToken.getTokenFromAccountContext(AccountContext.fromAccountModel(account));
         } else {
@@ -53,6 +56,6 @@ public class FormLoginAuthenticationProvider implements AuthenticationProvider {
     }
 
     private boolean isCorrectPassword(String password, Account account) {
-        return passwordEncoder.matches(account.getPassword(), password);
+        return passwordEncoder.matches(password, account.getPassword());
     }
 }

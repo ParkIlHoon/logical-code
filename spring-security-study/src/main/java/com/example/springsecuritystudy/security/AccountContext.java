@@ -11,6 +11,7 @@ import java.util.Collection;
 import java.util.List;
 import java.util.stream.Collectors;
 
+
 public class AccountContext extends User {
     public AccountContext(String username, String password, Collection<? extends GrantedAuthority> authorities) {
         super(username, password, authorities);
