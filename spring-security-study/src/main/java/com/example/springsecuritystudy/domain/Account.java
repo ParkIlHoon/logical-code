@@ -2,11 +2,13 @@ package com.example.springsecuritystudy.domain;
 
 import com.example.springsecuritystudy.enums.UserRole;
 import lombok.AllArgsConstructor;
+import lombok.Getter;
 import lombok.NoArgsConstructor;
 
 import javax.persistence.*;
 
 @Entity
+@Getter
 @NoArgsConstructor
 @AllArgsConstructor
 public class Account {
