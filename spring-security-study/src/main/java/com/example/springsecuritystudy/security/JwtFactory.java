@@ -21,7 +21,8 @@ public class JwtFactory {
         List<GrantedAuthority> authorities = accountContext.getAuthorities().stream().collect(Collectors.toList());
         token = JWT.create()
                 .withIssuer("logical-code")
-                .withClaim("USER_ROLE", authorities.get(0).getAuthority())
+                .withClaim("USER_NAME", accountContext.getAccount().getUserId())
+                .withClaim("USER_ROLE", accountContext.getAccount().getUserRole().getRoleName())
                 .sign(generateAlgorithm());
 
         return token;
