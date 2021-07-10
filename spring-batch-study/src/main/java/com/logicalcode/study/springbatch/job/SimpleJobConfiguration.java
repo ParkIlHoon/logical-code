@@ -25,10 +25,13 @@ public class SimpleJobConfiguration {
     public Job simpleJob() {
         return jobBuilderFactory.get("simpleJob")
                 .start(simpleStep1(null))
+                .next(simpleStep2(null))
                 .build();
     }
 
     /**
+     * BATCH_JOB_EXECUTION 에는 JOB_INSTANCE 의 모든 내역(성공/실패)을 가지고 있음
+     *
      *
      * @param requestDate Spring Batch 가 실행될 때 외부에서 받을 수 있는 파라미터
      *                    같은 Batch Job 이라도 Job Parameter 가 다르면 Batch_JOB_INSTANCE 테이블에 Job Instance 가 추가된다.
@@ -42,7 +45,18 @@ public class SimpleJobConfiguration {
     public Step simpleStep1(@Value("#{jobParameters[requestDate]}") String requestDate) {
         return stepBuilderFactory.get("simpleStep1")
                 .tasklet((contribution, chunkContext) -> {
-                    log.info(">>>>> This is Step1");
+                    throw new IllegalArgumentException("step1 에서 실패했습니다.");
+                })
+                .build();
+    }
+
+
+    @Bean
+    @JobScope
+    public Step simpleStep2(@Value("#{jobParameters[requestDate]}") String requestDate) {
+        return stepBuilderFactory.get("simpleStep2")
+                .tasklet((contribution, chunkContext) -> {
+                    log.info(">>>>> This is Step2");
                     log.info(">>>>> requestDate = {}", requestDate);
                     return RepeatStatus.FINISHED;
                 })
