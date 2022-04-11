@@ -87,6 +87,60 @@ fun main(args: Array<String>) {
     horse.run()
     horse.eat()
     println("---------------------")
+
+    println("---------------------")
+    b(::a)
+    println("---------------------")
+
+    println("---------------------")
+    var c: (String) -> Unit = { str -> println("$str 람다 함수") }
+    var lambdaC = { str: String -> println("$str 람다 함수") }
+    b(c)
+    println("---------------------")
+
+    println("---------------------")
+    var bookA = Book("코틀린", 10000).apply {
+        name = "[초특가]" + name
+        discount()
+    }
+    println("상품명 : ${bookA.name}, 가격 : ${bookA.price}")
+    println("---------------------")
+
+    println("---------------------")
+    bookA.run {
+        println("상품명 : ${name}, 가격 : ${price}")
+    }
+    println("---------------------")
+
+    println("---------------------")
+    println(Counter.count)
+    Counter.countUp()
+    Counter.countUp()
+    println(Counter.count)
+    Counter.clear()
+    println(Counter.count)
+    println("---------------------")
+
+    println("---------------------")
+    var jjajang = FoodPoll("짜장")
+    var jjampong = FoodPoll("짬뽕")
+
+    jjajang.vote()
+    jjajang.vote()
+
+    jjampong.vote()
+    jjampong.vote()
+    jjampong.vote()
+
+    println(jjajang.count)
+    println(jjampong.count)
+    println(FoodPoll.total)
+    println("---------------------")
+
+    println("---------------------")
+    EventPrinter().start()
+    println()
+    println("---------------------")
 }
 
 /**
@@ -294,4 +348,116 @@ class Horse : Runner, Eater {
     override fun eat() {
         println("당근을 먹어요")
     }
+}
+
+/**
+ * 패키지 스코프
+ * public(기본값)  어떤 패키지에서도 접근 가능
+ * internal      같은 모듈 내에서만 접근 가능
+ * private       같은 파일 내에서만 접근 가능
+ * protected 사용 안함
+ *
+ *
+ * 클래스 스코프
+ * public(기본값)  클래스 외부에서 늘 접근 가능
+ * private       클래스 내부에서만 접근 가능
+ * protected     클래스 자신과 상속받은 클래스에서 접근 가능
+ * internal 사용 안함
+ */
+
+/**
+ * 고차 함수
+ * 함수를 클래스에서 만들어낸 인스턴스처럼 취급하는 방법
+ * 함수를 파라미터로 넘겨줄 수도 있고 결과값으로 반환받을 수도 있는 방법
+ */
+fun a (str: String) {
+    println("$str 함수 a")
+}
+fun b (function: (String) -> Unit) {
+    function("b가 호출한")
+}
+
+/**
+ * 스코프 함수
+ * 클래스의 인스턴스를 스코프 함수에 전달하면 인스턴스의 속성이나 함수를 좀 더 깔끔하게 불러 쓸 수 있음
+ * apply : 인스턴스를 생성한 후 변수에 담기 전에 초기화 과정을 수행할 때 많이 쓰임. main 함수와 별도의 스코프에서 인스턴스의 변수와 함수를 조작함.
+ * run : run 스코프 안에서 참조 연산자를 사용하지 않아도 됨. 마지막 구문의 결과값을 반환함. 인스턴스가 만들어진 후에 인스턴스의 함수나 속성을 스코프 내에서 사용해야할 때.
+ * with : run과 동일하나 인스턴스를 참조 연산자 대신 파라미터로 받음.
+ * also : 처리가 끝나면 인스턴스를 반환, it 사용가능
+ * let : 처리가 끝나면 마지막 구문의 결과값을 반환. it 사용 가능
+ */
+class Book(var name: String, var price: Int) {
+    fun discount() {
+        price -= 2000
+    }
+}
+
+/**
+ * Object
+ * 싱글턴 패턴을 언어 차원에서 지원
+ */
+object Counter {
+    var count = 0
+
+    fun countUp() {
+        count++
+    }
+
+    fun clear() {
+        count = 0
+    }
+}
+
+/**
+ * companion object
+ */
+class FoodPoll (val name: String) {
+    companion object {
+        var total = 0
+    }
+
+    var count = 0
+
+    fun vote() {
+        total++
+        count++
+    }
+}
+
+/**
+ * observer 패턴
+ */
+class EventPrinter: EventListener {
+    override fun onEvent(count: Int) {
+        print("${count}-")
+    }
+
+    fun start() {
+        val counter = EventCounter(this)
+        counter.count()
+    }
+
+    /**
+     * EventPrinter 가 EventListener 를 구현하지 않을 경우
+     */
+//    fun start() {
+//        var counter = EventCounter(object: EventListener {
+//            override fun onEvent(count: Int) {
+//                print("${count}-")
+//            }
+//        })
+//        counter.count()
+//    }
+}
+class EventCounter(var eventListener: EventListener) {
+    fun count() {
+        for (i in 1..100) {
+            if (i % 5 == 0) {
+                eventListener.onEvent(i)
+            }
+        }
+    }
+}
+interface EventListener {
+    fun onEvent(count: Int)
 }
