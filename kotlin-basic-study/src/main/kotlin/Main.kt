@@ -164,6 +164,32 @@ fun main(args: Array<String>) {
 
     doShouting(B())
     println("---------------------")
+
+    println("---------------------")
+    var nullableA: String? = null
+    println(nullableA?.uppercase())
+    println(nullableA?:"null replace".uppercase())
+//    println(nullableA!!.uppercase())
+    nullableA?.run {
+        println(uppercase())
+    }
+    println("---------------------")
+
+    println("---------------------")
+    var prodA = Product("콜라", 1000)
+    var prodB = Product("콜라", 1000)
+    var prodC = prodA
+    var prodD = Product("사이다", 1000)
+
+    println(prodA == prodB)
+    println(prodA === prodB)
+
+    println(prodA == prodC)
+    println(prodA === prodC)
+
+    println(prodA == prodD)
+    println(prodA === prodD)
+    println("---------------------")
 }
 
 /**
@@ -509,30 +535,55 @@ class Cola : Drink() {
     }
 }
 
+/**
+ * generic
+ */
 open class A {
     open fun shout() {
         println("A 가 소리칩니다")
     }
 }
-
 class B: A() {
     override fun shout() {
         println("B 가 소리칩니다")
     }
 }
-
 class C: A() {
     override fun shout() {
         println("C 가 소리칩니다")
     }
 }
-
 class UsingGeneric<T: A> (val t: T) {
     fun doShouting() {
         t.shout()
     }
 }
-
 fun <T: A> doShouting(t: T) {
     t.shout()
+}
+
+/**
+ * List<out T> : 생성시에 넣은 객체를 대체, 추가, 삭제할 수 없음
+ * MutableList<T> : 생성시에 넣은 객체를 대체, 추가, 삭제할 수 있음
+ */
+var list = listOf("사과", "딸기", "배")
+var mutableList = mutableListOf(6, 3, 1)
+
+/**
+ * null 연산자
+ * null safe operator(?.) : 참조연산자를 실행하기 전에 객체 null 체크 후 null 일 경우 이후 구문을 실행하지 않음
+ * elvis operator(?:) : 객체가 null 이라면 연산자 우측 값으로 대체
+ * non-null assertion operator(!!.) : 참조연산자를 사용할 때 컴파일 시 null 체크를 하지 않고 런타임에서 NPE 를 유발하도록 방치
+ */
+
+/**
+ * 객체의 동일성 : ===
+ */
+class Product(val name: String, val price: Int) {
+    override fun equals(other: Any?): Boolean {
+        if (other is Product) {
+            return other.name == name && other.price == price
+        }
+        return false
+    }
 }
