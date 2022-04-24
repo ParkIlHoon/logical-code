@@ -1,4 +1,4 @@
-package main.kotlin.chapter2
+package chapter2
 
 fun main() {
     val a = readLine()!!.toInt()
