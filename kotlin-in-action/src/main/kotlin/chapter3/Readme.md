@@ -228,5 +228,42 @@ println(5 in 1 downTo 10)   // false: 빈 진행임
 15 downTo 9 step 2  // 15, 13, 11, 9
 ```
 
-## when 문과 여럿 중에 하나 선택하기
+## `when` 문과 여럿 중에 하나 선택하기
+```kotlin
+fun hexDigit(n :Int) :Char {
+    when {
+        n in 0..9 -> return '0' + n
+        n in 10..15 -> return 'A' + n - 10
+        else -> return '?'
+    }
+}
+```
+* 기본적으로 `when`문은 `when` 키워드 다음에 블록이 온다.
+* 블록 안에는 `조건 -> 문` 형태로 된 여러 개의 가지와 `else -> 문` 형태로 된 한 가지가 있을 수 있다.
+* `when`문도 `if`처럼 식을 쓸 수 있고, 이 경우 `else` 가지를 반드시 포함시켜야 한다.
+* 코틀린의 `when`에서는 임의의 조건을 검사할 수 있지만, 자바의 `switch`는 주어진 식의 여러 가지 값 중 하나만 선택할 수 있다.
+* 자바의 `switch`는 폴스루(fall-through)를 지원하지만 코틀린의 `when`은 조건을 만족하는 가지만 실행하고 절대 폴스루하지 않는다.
 
+---
+
+# 루프
+## `for`루프와 이터러블
+```kotlin
+fun main() {
+    val a = IntArray(10) { it * it }
+    val sum = 0
+  
+    for (x in a) {
+        sum += x
+    }
+  
+    println("Sum : $sum")
+}
+``` 
+* 일반 변수와는 달리 루프 변수에는 `val`이나 `var`을 붙이지 않으며 루프 변수는 자동으로 불변 값이 된다.
+
+## 루프 제어 흐름 변경하기: `break`와 `continue`
+* `break` : 즉시 루프를 종료시키고, 실행 흐름이 루프 바로 다음 문으로 이동하게 만든다.
+* `continue` : 현재 루프 이터레이션을 마치고 조건 검사로 바로 진행하게 만든다.
+
+## 내포된 루프와 레이블
