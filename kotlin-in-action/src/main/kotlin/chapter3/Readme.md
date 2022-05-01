@@ -267,3 +267,86 @@ fun main() {
 * `continue` : 현재 루프 이터레이션을 마치고 조건 검사로 바로 진행하게 만든다.
 
 ## 내포된 루프와 레이블
+코틀린은 자바의 임의 레이블과 비슷하지만 약간 다른 문법의 레이블 기능을 제공한다.
+```kotlin
+fun indexOf(subarray :IntArray, array :IntArray) :Int {
+    outerLoop@
+    for (i in array.indices) {
+        innerLoop@
+        for (j in subarray.indices) {
+          if (subarray[j] != array[i + j]) {
+            continue@outerLoop
+          }
+        }
+        return i
+    }
+    return -1
+}
+```
+코틀린에서는 어느 문장 앞에든 레이블을 붙일 수 있지만, `break`와 `continue`에는 구체적으로 루프 앞에 붙은 레이블만 사용할 수 있다.
+
+## 꼬리 재귀 함수
+코틀린은 꼬리 재귀 함수에 대한 최적화 컴파일을 지원한다.
+```kotlin
+tailrec fun binIndexOf(
+    x :Int,
+    array :IntArray,
+    from :Int = 0,
+    to :Int = array.size
+) :Int {
+    if (from == to) return -1
+    val midIndex = (from + to - 1) / 2
+    val mid = array[midIndex]
+    return when {
+        mid < x -> binIndexOf(x, array, midIndex + 1, to)
+        mid > x -> binIndexOf(x, array, from, midIndex)
+        else -> midIndex
+    }
+}
+```
+코틀린은 `tailrec`을 붙이면 컴파일러가 재귀 함수를 비재귀적인 코드로 자동으로 변환해준다. 그 결과 양쪽의 장점, 즉 재귀 함수의 간결함과 비재귀 루프의 성능만을 취할 수 있다.<br>
+함수에 `tailrec`을 붙였는데 꼬리 재귀가 아니라는 사실을 컴파일러가 발견하면, 컴파일러는 경고를 표시하고 함수를 일반적인 재귀 함수로 컴파일 한다.
+
+---
+
+# 예외 처리
+## 예외 던지기
+오류 조건을 신호로 보내려면 자바와 마찬가지로 `throw`식에 예외 객체를 사용해야 한다.
+```kotlin
+fun parseIntNumber(s :String) {
+    var num = 0
+  
+    if (s.length !in 1..31) {
+        throw NumberFormatException("Not a Number :$s")
+    }
+    for (c in s) {
+        if (c !in '0'..'1') { 
+            throw NumberFormatException("Not a Number :$s")
+        }
+        num = num * 2 + (c - '0')
+    }
+    return num
+}
+```
+
+## try 문으로 예외 처리하기
+코틀린에서 예외를 처리할 때는 기본적으로 자바와 똑같은 문법의 try 문을 사용한다.
+```kotlin
+import java.lang.NumberFormatException
+
+fun readInt(default :Int) :Int {
+    try {
+        return readLine()!!.toInt()
+    } catch (e :NumberFormatException) {
+        return default
+    }
+}
+```
+자바 7부터는 `catch (FooException | BarException e) {}` 와 같은 구문을 사용해 한 캐치 블록 안에서 여러 예외를 처리할 수 있으나, 코틀린에서는 이런 핸들러를 아직 지원하지 않는다.<br>
+자바와 달리 코틀린에서는 검사 예외(checked exception)와 비검사 예외(unchecked exception)를 구분하지 않는다. 
+큰 프로젝트에서 발생할 수 있는 예외를 함수에 지정하도록 요구해도 실제로는 생산성이 저하되고 불필요하게 긴 준비 코드를 생성한다는 사실을 (자바를 사용한 경험으로부터)알았기 때문이다.
+
+`try` 블록을 식으로 사용할 경우, `finally` 블록의 값은 전체 `try` 블록의 값에 영향을 미치지 못한다.
+
+자바 7에 도입된 try-with-resource 와 같은 특별한 언어 구조를 제공하지는 않지만, 그 대신에 똑같은 작업을 수행할 수 있는 라이브러리 함수를 제공한다.
+
