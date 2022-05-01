@@ -228,5 +228,125 @@ println(5 in 1 downTo 10)   // false: 빈 진행임
 15 downTo 9 step 2  // 15, 13, 11, 9
 ```
 
-## when 문과 여럿 중에 하나 선택하기
+## `when` 문과 여럿 중에 하나 선택하기
+```kotlin
+fun hexDigit(n :Int) :Char {
+    when {
+        n in 0..9 -> return '0' + n
+        n in 10..15 -> return 'A' + n - 10
+        else -> return '?'
+    }
+}
+```
+* 기본적으로 `when`문은 `when` 키워드 다음에 블록이 온다.
+* 블록 안에는 `조건 -> 문` 형태로 된 여러 개의 가지와 `else -> 문` 형태로 된 한 가지가 있을 수 있다.
+* `when`문도 `if`처럼 식을 쓸 수 있고, 이 경우 `else` 가지를 반드시 포함시켜야 한다.
+* 코틀린의 `when`에서는 임의의 조건을 검사할 수 있지만, 자바의 `switch`는 주어진 식의 여러 가지 값 중 하나만 선택할 수 있다.
+* 자바의 `switch`는 폴스루(fall-through)를 지원하지만 코틀린의 `when`은 조건을 만족하는 가지만 실행하고 절대 폴스루하지 않는다.
+
+---
+
+# 루프
+## `for`루프와 이터러블
+```kotlin
+fun main() {
+    val a = IntArray(10) { it * it }
+    val sum = 0
+  
+    for (x in a) {
+        sum += x
+    }
+  
+    println("Sum : $sum")
+}
+``` 
+* 일반 변수와는 달리 루프 변수에는 `val`이나 `var`을 붙이지 않으며 루프 변수는 자동으로 불변 값이 된다.
+
+## 루프 제어 흐름 변경하기: `break`와 `continue`
+* `break` : 즉시 루프를 종료시키고, 실행 흐름이 루프 바로 다음 문으로 이동하게 만든다.
+* `continue` : 현재 루프 이터레이션을 마치고 조건 검사로 바로 진행하게 만든다.
+
+## 내포된 루프와 레이블
+코틀린은 자바의 임의 레이블과 비슷하지만 약간 다른 문법의 레이블 기능을 제공한다.
+```kotlin
+fun indexOf(subarray :IntArray, array :IntArray) :Int {
+    outerLoop@
+    for (i in array.indices) {
+        innerLoop@
+        for (j in subarray.indices) {
+          if (subarray[j] != array[i + j]) {
+            continue@outerLoop
+          }
+        }
+        return i
+    }
+    return -1
+}
+```
+코틀린에서는 어느 문장 앞에든 레이블을 붙일 수 있지만, `break`와 `continue`에는 구체적으로 루프 앞에 붙은 레이블만 사용할 수 있다.
+
+## 꼬리 재귀 함수
+코틀린은 꼬리 재귀 함수에 대한 최적화 컴파일을 지원한다.
+```kotlin
+tailrec fun binIndexOf(
+    x :Int,
+    array :IntArray,
+    from :Int = 0,
+    to :Int = array.size
+) :Int {
+    if (from == to) return -1
+    val midIndex = (from + to - 1) / 2
+    val mid = array[midIndex]
+    return when {
+        mid < x -> binIndexOf(x, array, midIndex + 1, to)
+        mid > x -> binIndexOf(x, array, from, midIndex)
+        else -> midIndex
+    }
+}
+```
+코틀린은 `tailrec`을 붙이면 컴파일러가 재귀 함수를 비재귀적인 코드로 자동으로 변환해준다. 그 결과 양쪽의 장점, 즉 재귀 함수의 간결함과 비재귀 루프의 성능만을 취할 수 있다.<br>
+함수에 `tailrec`을 붙였는데 꼬리 재귀가 아니라는 사실을 컴파일러가 발견하면, 컴파일러는 경고를 표시하고 함수를 일반적인 재귀 함수로 컴파일 한다.
+
+---
+
+# 예외 처리
+## 예외 던지기
+오류 조건을 신호로 보내려면 자바와 마찬가지로 `throw`식에 예외 객체를 사용해야 한다.
+```kotlin
+fun parseIntNumber(s :String) {
+    var num = 0
+  
+    if (s.length !in 1..31) {
+        throw NumberFormatException("Not a Number :$s")
+    }
+    for (c in s) {
+        if (c !in '0'..'1') { 
+            throw NumberFormatException("Not a Number :$s")
+        }
+        num = num * 2 + (c - '0')
+    }
+    return num
+}
+```
+
+## try 문으로 예외 처리하기
+코틀린에서 예외를 처리할 때는 기본적으로 자바와 똑같은 문법의 try 문을 사용한다.
+```kotlin
+import java.lang.NumberFormatException
+
+fun readInt(default :Int) :Int {
+    try {
+        return readLine()!!.toInt()
+    } catch (e :NumberFormatException) {
+        return default
+    }
+}
+```
+자바 7부터는 `catch (FooException | BarException e) {}` 와 같은 구문을 사용해 한 캐치 블록 안에서 여러 예외를 처리할 수 있으나, 코틀린에서는 이런 핸들러를 아직 지원하지 않는다.<br>
+자바와 달리 코틀린에서는 검사 예외(checked exception)와 비검사 예외(unchecked exception)를 구분하지 않는다. 
+큰 프로젝트에서 발생할 수 있는 예외를 함수에 지정하도록 요구해도 실제로는 생산성이 저하되고 불필요하게 긴 준비 코드를 생성한다는 사실을 (자바를 사용한 경험으로부터)알았기 때문이다.
+
+`try` 블록을 식으로 사용할 경우, `finally` 블록의 값은 전체 `try` 블록의 값에 영향을 미치지 못한다.
+
+자바 7에 도입된 try-with-resource 와 같은 특별한 언어 구조를 제공하지는 않지만, 그 대신에 똑같은 작업을 수행할 수 있는 라이브러리 함수를 제공한다.
 
