@@ -199,6 +199,53 @@ fun main() {
     println(p.shift(-1, 3))
 }
 ```
+지역 클래스는 클래스 본문 안에서 자신이 접근할 수 있는 값을 포획(capture)할 수 있고, 심지어는 변경할 수도 있다.
+```kotlin
+fun main() {
+    var x = 1
+  
+    class Counter {
+        fun increment() {
+            x++
+        }
+    }
+  
+    Counter().increment()
+    println(x)  // 2
+}
+```
+하지만 코틀린이 제공하는 포획 변수를 변경하는 기능은 그에 따른 비용을 수반한다.<br>
+익명 객체와 이 객체를 둘러싸고 있는 코드 사이에 변수를 공유하기 위해 코틀린 컴파일러는 값을 특별한 래퍼 객체로 둘러싼다.<br>
+위 예제를 컴파일한 바이트코드에 해당하는 자바 코드는 아래와 같다.
+```java
+import kotlin.jvm.internal.Ref.IntRef;
+
+class MainKt {
+  public static void main(String[] args) {
+    final IntRef x = new IntRef();  // 래퍼 생성
+    x.element = 1;
+    
+    final class Counter {
+        public final void increment() {
+            x.element++;
+        }
+    }
+    
+    (new Counter()).increment();
+    System.out.println(x.element);
+  }
+}
+```
+내포된 클래스와 달리 지역 클래스에는 가시성 변경자를 붙일 수 없으며, 지역 클래스의 영역은 항상 자기를 둘러싼 블록으로 제한된다.<br>
+지역 클래스도 함수, 프로퍼티, 생성자, 내포된 클래스 등 다른 클래스가 포함할 수 있는 모든 멤버를 포함할 수 있따. 하지만 내포된 클래스는 반드시 `inner` 클래스여야만 한다.
+
+---
+
+# 널 가능성
+코틀린 타입 시스템에서는 널 값이 될 수 있는 참조 타입과 널 값이 될 수 없는 참조 타입을 확실히 구분해주는 큰 장점이 있다. 
+이 기능은 널 발생 여부를 컴파일 시점으로 옮겨주기 때문에 악명 높은 `NullPointerExeption` 예외를 상당 부분 막을 수 있다.
+
+## 널이 될 수 있는 타입
 
 
 
